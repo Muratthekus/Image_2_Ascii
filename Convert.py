@@ -1,6 +1,5 @@
 import sys, time
 from builtins import print
-
 import keyboard
 from PIL import Image, ImageDraw, ImageFont
 
@@ -36,8 +35,9 @@ class convert:
         for i in range(0,width,5):
             for j in range(0,height,2):
                 ascii_value = self.char_map.get(int((self.gray_pix[i, j] / 255) * 69))
-                file.write(ascii_value)
-            file.write("\n")
+                print(ascii_value,end='')
+
+            print()
 
     def run(self):
         self.ascii_converter()
