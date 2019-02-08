@@ -1,44 +1,48 @@
 from PIL import Image, ImageDraw, ImageFont
+import os
+
+desktop = os.path.join(os.environ["HOMEPATH"], "Desktop")
+
+def runner(PATH):
+    PATH = PATH
+    image = Image.open(PATH)
+    char_map = char_map_func()  # Keep ascii character in a list
+    gray_image = gray_image_process(image)
+    gray_image.save("gray.jpg")
+    ascii_converter(char_map)
 
 
-class convert:
-    def __init__(self, PATH):
-        self.PATH = PATH
-        self.image = Image.open(PATH)
-        self.pix = self.image.load()
-        self.char_map = self.char_map_uret()  # Karakter map'ini tutuyor
+def char_map_func():
+    # <----darkest---------------------brightest-------------->
+    liste = list("""$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,"^`'. """)
+    char = dict()
+    for i in range(len(liste)):
+        char[i] = liste[i]
+    return char
 
-        self.gray_image = Image.new(self.image.mode,
-                                    self.image.size)  # Orjinal resmin gray value'sine göre yeniden yazılması
-        self.gray_image = self.gray_image_process()
-        self.gray_image.save("gray.jpg")
-        self.ascii_converter()
 
-    def char_map_uret(self):
-        # Siyah-beyaz alb-an oranlarına göre sıralı karakterler
-        liste = list("""$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,"^`'. """)
-        char = dict()
-        for i in range(len(liste)):
-            char[i] = liste[i]
-        return char
+def gray_image_process(image):
+    return image.convert('L')
 
-    def gray_image_process(self):
-        return self.image.convert('L')
 
-    def ascii_converter(self):
-        file = open("asci.txt", "w",)
-        self.gray_image = Image.open("gray.jpg")
-        self.gray_pix = self.gray_image.load()
-        width, height = self.gray_image.size
-        im=Image.new("RGB",self.gray_image.size,color="white")
-        im_pix=im.load()
+def ascii_converter(char_map):
+    gray_image = Image.open("gray.jpg")
+    gray_pix = gray_image.load()
+    width, height = gray_image.size
 
-        font = ImageFont.truetype("arial.ttf", 3)
-        drawer = ImageDraw.Draw(im)
+    im = Image.new("RGB", gray_image.size, color="white")  # ascii character will write on this image
+    font = ImageFont.truetype("arial.ttf", 3)
+    drawer = ImageDraw.Draw(im)
 
-        for i in range(0,width,5):
-            for j in range(0,height,2):
-                ascii_value = self.char_map.get(int((self.gray_pix[i, j] / 255) * 69))
-                drawer.text((i, j), ascii_value, font=font, fill=(0, 0, 0))
+    for i in range(0, width, 5):
+        for j in range(0, height, 2):
+            ascii_value = char_map.get(int((gray_pix[i, j] / 255) * 69))
+            drawer.text((i, j), ascii_value, font=font, fill=(0, 0, 0))
 
-        im.save("ascii.png")
+    im.save(desktop+r"\ascii.png")
+    print("Image saved your desktop")
+
+
+if __name__ == "__main__":
+    print("Please copy the image to your desktop")
+    runner(PATH=desktop+"\\"+input("Please write filename(ex: image.png)"))
