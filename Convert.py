@@ -1,6 +1,3 @@
-import sys, time
-from builtins import print
-import keyboard
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -15,6 +12,7 @@ class convert:
                                     self.image.size)  # Orjinal resmin gray value'sine göre yeniden yazılması
         self.gray_image = self.gray_image_process()
         self.gray_image.save("gray.jpg")
+        self.ascii_converter()
 
     def char_map_uret(self):
         # Siyah-beyaz alb-an oranlarına göre sıralı karakterler
@@ -32,12 +30,15 @@ class convert:
         self.gray_image = Image.open("gray.jpg")
         self.gray_pix = self.gray_image.load()
         width, height = self.gray_image.size
+        im=Image.new("RGB",self.gray_image.size,color="white")
+        im_pix=im.load()
+
+        font = ImageFont.truetype("arial.ttf", 3)
+        drawer = ImageDraw.Draw(im)
+
         for i in range(0,width,5):
             for j in range(0,height,2):
                 ascii_value = self.char_map.get(int((self.gray_pix[i, j] / 255) * 69))
-                print(ascii_value,end='')
+                drawer.text((i, j), ascii_value, font=font, fill=(0, 0, 0))
 
-            print()
-
-    def run(self):
-        self.ascii_converter()
+        im.save("ascii.png")
